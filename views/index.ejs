@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Notes</title>
+  </head>
+  <body>
+    <h1>Book Notes</h1>
+    <a href="/compose">Add a New Book Note</a>
+    <div class="book-container">
+      <% entries.forEach(book => { %>
+      <!-- <div class="book-card">
+        <h2 class="book-title"><%= book.title %></h2>
+
+        <p>
+          <strong>rating:</strong> <%= book.rating %>
+          <span class="spacer"></span>
+          <strong>description:</strong> <%= book.description %>
+        </p>
+      </div> -->
+      <div class="book-item">
+        <h3><%= book.title %></h3>
+        <p><strong>Rating:</strong> <%= book.rating %></p>
+        <p><strong>Description:</strong> <%= book.description %></p>
+        <img
+          src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg"
+          alt="Book Cover"
+        />
+      </div>
+      <% }); %>
+    </div>
+  </body>
+</html>
