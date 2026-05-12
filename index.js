@@ -56,6 +56,15 @@ app.post("/new", async (req, res) => {
   
   }
 });
+app.post("/delete", async (req, res) => {
+  const id = req.body.deleteItemId;
+  try {
+    await db.query("DELETE FROM books WHERE id = $1", [id]);
+    res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
