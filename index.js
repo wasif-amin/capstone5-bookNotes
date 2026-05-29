@@ -65,7 +65,31 @@ app.post("/delete", async (req, res) => {
     console.log(err);
   }
 });
+app.get("/edit/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await db.query("SELECT * FROM books WHERE id = $1", [id]);
+  const entry = result.rows[0];
+  res.render("edit.ejs", { book: entry });
+});
+app.post("/edit", async (req, res) => {
+  
+  const id = req.body.id;
+  const title = req.body.updatedTitle;
+  const rating = req.body.updatedRating;
+  const isbn = req.body.updated_isbn;
+  const description = req.body.description;
 
+  try {
+    await db.query(
+      "UPDATE books SET title = $1, rating = $2, description = $3, isbn = $4 WHERE id = $5",
+      [title, rating, description, isbn, id]
+    );
+    res.redirect("/");
+  } catch (err) {
+    console.log("Error updating database:", err);
+    res.status(500).send("Database update failed.");
+  }
+});
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
