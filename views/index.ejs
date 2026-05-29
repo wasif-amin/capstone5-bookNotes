@@ -27,7 +27,25 @@
           src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg"
           alt="Book Cover"
         />
+        <form
+          action="/edit/<%= book.id %>"
+          method="GET"
+          style="display: inline-block; margin-top: 10px"
+        >
+          <a href="edit.ejs?id=<%= book.id %>">
+            <button style="background-color: skyblue; color: white" type="submit">
+              edit note
+            </button>
+          </a>
+        </form>
+        <form action="/delete" method="POST" style="margin-top: 10px">
+          <input type="hidden" name="deleteItemId" value="<%= book.id %>" />
+          <button style="background-color: orange; color: white" type="submit">
+            delete note
+          </button>
+        </form>
       </div>
+
       <% }); %>
     </div>
   </body>
