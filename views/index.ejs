@@ -7,7 +7,9 @@
   </head>
   <body>
     <h1>Book Notes</h1>
-    <a href="/compose">Add a New Book Note</a>
+    <% if (isAdmin) { %>
+    <a href="/compose" class="btn-add">Add New Book Note</a>
+    <% } %>
     <div class="book-container">
       <% entries.forEach(book => { %>
       <!-- <div class="book-card">
@@ -27,7 +29,7 @@
           src="https://covers.openlibrary.org/b/isbn/<%= book.isbn %>-M.jpg"
           alt="Book Cover"
         />
-        <form
+        <!-- <form
           action="/edit/<%= book.id %>"
           method="GET"
           style="display: inline-block; margin-top: 10px"
@@ -43,7 +45,19 @@
           <button style="background-color: orange; color: white" type="submit">
             delete note
           </button>
-        </form>
+        </form> -->
+        <% if (isAdmin) { %>
+        <div class="admin-controls">
+          <a href="/edit/<%= book.id %>" class="btn-edit"
+            ><button>edit</button></a
+          >
+
+          <form action="/delete" method="POST" style="display: inline">
+            <input type="hidden" name="deleteItemId" value="<%= book.id %>" />
+            <button type="submit" class="btn-delete">Delete</button>
+          </form>
+        </div>
+        <% } %>
       </div>
 
       <% }); %>

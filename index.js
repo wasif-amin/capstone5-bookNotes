@@ -57,7 +57,10 @@ function isAdmin(req, res, next) {
 app.get("/", async (req, res) => {
   const result = await db.query("SELECT * FROM books ORDER BY id ASC ");
   const entries = result.rows;
-  res.render("index.ejs", { entries: entries });
+  res.render("index.ejs", {
+    entries: entries,
+    isAdmin: req.session.isAdmin || false,
+  });
 });
 app.get("/compose", isAdmin, (req, res) => {
   res.render("compose.ejs");
