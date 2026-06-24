@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 import pg from "pg";
+import session from "express-session";
 
 const app = express();
 const port = 3000;
@@ -17,6 +18,16 @@ db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+
+app.use(
+  session({
+    secret: "TOPSECRETWORD",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+  })
+);
+
 async function bookCover(isbn) {
   try {
     const url = `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`;
@@ -33,15 +44,25 @@ async function bookCover(isbn) {
     return null;
   }
 }
+app.get("/wasif-login", (req, res) => {
+  req.session.isAdmin = true;
+  res.send("<h1>You are now logged in !</h1><a href='/'>Go to Home</a>");
+});
+function isAdmin(req, res, next) {
+  if (req.session && req.session.isAdmin === true) {
+    return next();
+  }
+  res.status(403).send("Unauthorized: Only Wasif can modify these book notes.");
+}
 app.get("/", async (req, res) => {
   const result = await db.query("SELECT * FROM books ORDER BY id ASC ");
   const entries = result.rows;
   res.render("index.ejs", { entries: entries });
 });
-app.get("/compose", (req, res) => {
+app.get("/compose", isAdmin, (req, res) => {
   res.render("compose.ejs");
 });
-app.post("/new", async (req, res) => {
+app.post("/new", isAdmin, async (req, res) => {
   const title = req.body.title;
   const description = req.body.description;
   const rating = req.body.rating;
@@ -57,7 +78,7 @@ app.post("/new", async (req, res) => {
     res.redirect("/");
   }
 });
-app.post("/delete", async (req, res) => {
+app.post("/delete", isAdmin, async (req, res) => {
   const id = req.body.deleteItemId;
   try {
     await db.query("DELETE FROM books WHERE id = $1", [id]);
@@ -66,18 +87,13 @@ app.post("/delete", async (req, res) => {
     console.log(err);
   }
 });
-app.get("/edit/:id", async (req, res) => {
+app.get("/edit/:id", isAdmin, async (req, res) => {
   const id = req.params.id;
   const result = await db.query("SELECT * FROM books WHERE id = $1", [id]);
   const entry = result.rows[0];
   res.render("edit.ejs", { book: entry });
 });
 app.post("/edit", async (req, res) => {
-  // 🌟 ADD THESE THREE LINES FOR DEBUGGING:
-  console.log("===============================");
-  console.log("DATA RECEIVED FROM FORM:", req.body);
-  console.log("===============================");
-
   const id = req.body.id;
   const title = req.body.updatedTitle;
   const rating = req.body.updatedRating;
